@@ -11,15 +11,17 @@
     --danger: #ff6b6b;
     --radius: 18px;
     --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+      /* Taille du carré logo (min → pref → max) */
+    --logo: clamp(44px, 8vw, 72px);
 }
 
 * {
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
 html,
 body {
-    height: 100%
+    height: 100%;
 }
 
 body {
@@ -36,55 +38,83 @@ body {
 .wrap {
     max-width: 980px;
     margin: 0 auto;
-    padding: 24px 20px 80px
+    padding: 24px 20px 80px;
 }
 
 header {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin: 8px 0 22px;
+    gap: 14px;
+    margin-bottom: 20px;
 }
 
+/* Carré logo qui reste carré + texte qui scale */
 .logo {
-    width: 54px;
-    height: 54px;
+    flex: 0 0 auto;
+    width: var(--logo);
+    height: var(--logo);
     border-radius: 16px;
-    background: radial-gradient(120% 120% at 10% 10%, #ff84b0, #ff3b81 48%, #9b2d72);
-    box-shadow: 0 6px 18px rgba(255, 59, 129, .25), inset 0 0 18px rgba(255, 255, 255, .25);
     display: grid;
     place-items: center;
+    /* le texte “PH” scale avec la hauteur du carré */
+    font-size: calc(var(--logo) * 0.6);
     font-weight: 800;
-    color: white;
     letter-spacing: .5px;
+    color: #fff;
+    background: radial-gradient(120% 120% at 10% 10%, #ff84b0, #ff3b81 48%, #9b2d72);
+    box-shadow: 0 6px 18px rgba(255, 59, 129, .25), inset 0 0 18px rgba(255, 255, 255, .25);
 }
 
+/* Le bloc titre est en colonne: H1 puis tagline */
+.title {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* permet au texte de wrap proprement si très long */
+}
+
+/* H1 synchronisé sur la hauteur du logo */
 .title h1 {
-    font-size: clamp(22px, 4vw, 36px);
-    margin: 0 0 4px;
-    font-weight: 800;
-    letter-spacing: .4px
-}
-
-.title p {
+    position: relative;
     margin: 0;
-    color: var(--muted);
-    font-weight: 600
+    line-height: 1;
+    /* taille calée sur --logo pour hauteur visuelle proche du carré */
+    font-size: calc(var(--logo) * .9); /* ajuste 0.88–1.00 si besoin selon rendu */
+    font-weight: 800;
+    letter-spacing: .4px;
+    white-space: nowrap;
+    /* overflow: hidden; */
+    text-overflow: ellipsis;
 }
 
-.tagline {
+/* Tagline sous le titre, générée via ::after du H1 */
+.title h1::after {
+    content: attr(data-tagline);
     display: inline-block;
-    margin-top: 6px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255, 59, 129, .12), rgba(139, 92, 246, .12));
-    color: #ffd7e6;
-    border: 1px solid rgba(255, 59, 129, .25);
-    font-size: 12px;
+    position: absolute;
+    bottom: -7px;
+    left: 3px;
+    font-size: clamp(12px, calc(var(--logo) * 0.24), 14px);
     font-weight: 700;
-    letter-spacing: .4px;
-    text-transform: uppercase
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    color: #ffd7e6;
 }
+/* Activer le gradient sur le texte (Chrome/Safari/Firefox récents) */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .title h1::after {
+      background: linear-gradient(90deg, rgba(255, 59, 129, .8), rgba(139, 92, 246, .8));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;              /* masque la couleur unie */
+      -webkit-text-fill-color: transparent; /* Safari/WebKit */
+    }
+}
+
+  /* Si pas de tagline (attribut vide), on ne montre rien */
+  .title h1[data-tagline=""]::after {
+    content: "";
+    display: none;
+  }
 
 .card {
     background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .01));
@@ -100,7 +130,7 @@ header {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    margin: 12px 0 18px
+    margin: 12px 0 18px;
 }
 
 .chip {
@@ -120,21 +150,21 @@ header {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, .18)
+    background: rgba(255, 255, 255, .18);
 }
 
 .chip.active {
     color: #fff;
     border-color: rgba(255, 59, 129, .45);
-    background: linear-gradient(90deg, rgba(255, 59, 129, .16), rgba(139, 92, 246, .16))
+    background: linear-gradient(90deg, rgba(255, 59, 129, .16), rgba(139, 92, 246, .16));
 }
 
 .chip.active .dot {
-    background: var(--accent)
+    background: var(--accent);
 }
 
 .hidden {
-    display: none !important
+    display: none !important;
 }
 
 /* Options buttons */
@@ -143,19 +173,19 @@ header {
     color: #cfd1d8;
     font-weight: 700;
     letter-spacing: .3px;
-    text-transform: uppercase;
-    font-size: 12px
+    /* text-transform: uppercase; */
+    font-size: 16px;
 }
 
 .option-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px
+    gap: 12px;
 }
 
 @media (max-width:720px) {
     .option-grid {
-        grid-template-columns: repeat(2, 1fr)
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -177,7 +207,7 @@ header {
 
 .option-btn:hover {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, .22)
+    border-color: rgba(255, 255, 255, .22);
 }
 
 .option-btn.selected {
@@ -190,7 +220,7 @@ header {
     display: flex;
     gap: 10px;
     align-items: center;
-    margin-top: 12px
+    margin-top: 12px;
 }
 
 .option-inline input[type="number"] {
@@ -205,25 +235,38 @@ header {
     outline: none;
 }
 
+/* Pour que l'input "AUTRE" rende comme un bouton */
+.option-input {
+    text-align: center;
+    appearance: textfield;
+  }
+  .option-input::-webkit-outer-spin-button,
+  .option-input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+  
+
 /* Player form */
 .player-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px
+    margin-bottom: 12px;
 }
 
 .player-index {
     font-weight: 800;
-    color: #e0e2e9
+    color: #e0e2e9;
 }
 
 .player-form .field {
-    margin: 8px 0 16px
+    margin: 8px 0 16px;
 }
 
 .player-form input[type="text"] {
     width: 100%;
+    margin-top: 10px;
     padding: 14px 16px;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, .12);
@@ -237,12 +280,12 @@ header {
 .reason-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px
+    gap: 10px;
 }
 
 @media (max-width:720px) {
     .reason-grid {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
     }
 }
 
@@ -253,22 +296,22 @@ header {
     border: 1px solid rgba(255, 255, 255, .08);
     padding: 10px 12px;
     border-radius: 12px;
-    background: #14141a
+    background: #14141a;
 }
 
 .reason input {
     margin-top: 4px;
-    transform: scale(1.2)
+    transform: scale(1.2);
 }
 
 .reason .lbl {
-    line-height: 1.25
+    line-height: 1.25;
 }
 
 .reason .num {
     opacity: .7;
     font-weight: 800;
-    margin-right: 4px
+    margin-right: 4px;
 }
 
 .actions-row {
@@ -276,7 +319,7 @@ header {
     gap: 12px;
     flex-wrap: wrap;
     justify-content: flex-end;
-    margin-top: 16px
+    margin-top: 16px;
 }
 
 /* Buttons */
@@ -293,28 +336,28 @@ header {
 }
 
 .btn:hover {
-    transform: translateY(-1px)
+    transform: translateY(-1px);
 }
 
 .btn:active {
-    transform: translateY(0)
+    transform: translateY(0);
 }
 
 .btn-ghost {
     background: transparent;
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, .18)
+    border: 1px solid rgba(255, 255, 255, .18);
 }
 
 .btn-accent {
     background: linear-gradient(90deg, #ff3b81, #8b5cf6);
     color: #fff;
-    box-shadow: 0 6px 22px rgba(255, 59, 129, .28)
+    box-shadow: 0 6px 22px rgba(255, 59, 129, .28);
 }
 
 .btn-ok {
     background: linear-gradient(90deg, #00d18f, #46e3b0);
-    color: #0c1211
+    color: #0c1211;
 }
 
 .btn[disabled],
@@ -337,19 +380,19 @@ header {
     color: #cfd1d8;
     text-transform: uppercase;
     letter-spacing: .35px;
-    font-weight: 800
+    font-weight: 800;
 }
 
 .phrase {
     font-size: clamp(22px, 4vw, 32px);
     line-height: 1.2;
-    font-weight: 800
+    font-weight: 800;
 }
 
 .names {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap
+    flex-wrap: wrap;
 }
 
 .tag {
@@ -364,18 +407,18 @@ header {
 
 .note {
     color: var(--muted);
-    font-size: 14px
+    font-size: 14px;
 }
 
 footer.small {
     margin-top: 16px;
     color: #b9bdc7;
     font-size: 12px;
-    opacity: .9
+    opacity: .9;
 }
 
 .hr {
     height: 1px;
     background: linear-gradient(90deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02));
-    margin: 18px 0
+    margin: 18px 0;
 }

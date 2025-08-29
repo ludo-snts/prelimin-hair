@@ -1,7 +1,7 @@
 // js/data.js
 export const ACTIONS = [
     {
-      id: "bite",
+      id: "mordre",
       reason: "être mordu·e",
       labelNum: "Raison 01",
       templates: [
@@ -10,7 +10,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "scratch",
+      id: "griffer",
       reason: "qu’on me griffe (doucement)",
       labelNum: "Raison 02",
       templates: [
@@ -19,7 +19,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "tickle",
+      id: "chatouiller",
       reason: "qu’on me chatouille",
       labelNum: "Raison 03",
       templates: [
@@ -28,7 +28,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "shoulder_massage",
+      id: "masser_epaule",
       reason: "qu’on me masse les épaules",
       labelNum: "Raison 04",
       templates: [
@@ -37,7 +37,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "hair_stroke",
+      id: "caresser_cheveux",
       reason: "qu’on me caresse les cheveux",
       labelNum: "Raison 05",
       templates: [
@@ -46,7 +46,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "whisper",
+      id: "murmurer",
       reason: "qu’on me murmure à l’oreille",
       labelNum: "Raison 06",
       templates: [
@@ -55,7 +55,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "kiss",
+      id: "embrasser",
       reason: "qu’on m’embrasse (joue/nuque)",
       labelNum: "Raison 07",
       templates: [
@@ -64,7 +64,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "eye_contact",
+      id: "fixer_regard",
       reason: "qu’on me fixe du regard",
       labelNum: "Raison 08",
       templates: [
@@ -73,7 +73,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "hand_hold",
+      id: "tenir_main",
       reason: "qu’on me prenne la main",
       labelNum: "Raison 09",
       templates: [
@@ -82,7 +82,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "nape_stroke",
+      id: "effleurer",
       reason: "qu’on m’effleure la nuque",
       labelNum: "Raison 10",
       templates: [
@@ -91,7 +91,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "sing",
+      id: "chanter",
       reason: "qu’on me chante doucement",
       labelNum: "Raison 11",
       templates: [
@@ -100,7 +100,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "light_pinch",
+      id: "pincer",
       reason: "qu’on me pince (très légèrement)",
       labelNum: "Raison 12",
       templates: [
@@ -109,7 +109,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "neck_breath",
+      id: "souffler_cou",
       reason: "qu’on me souffle au cou",
       labelNum: "Raison 13",
       templates: [
@@ -118,7 +118,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "hand_massage",
+      id: "masser_main",
       reason: "qu’on me masse les mains",
       labelNum: "Raison 14",
       templates: [
@@ -127,7 +127,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "compliment",
+      id: "complimenter",
       reason: "qu’on me fasse des compliments",
       labelNum: "Raison 15",
       templates: [
@@ -136,7 +136,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "shoulder_brush",
+      id: "froler_epaule",
       reason: "qu’on me frôle l’épaule",
       labelNum: "Raison 16",
       templates: [
@@ -145,7 +145,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "nickname",
+      id: "donner_surnom",
       reason: "qu’on me donne un surnom",
       labelNum: "Raison 17",
       templates: [
@@ -154,7 +154,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "laugh",
+      id: "rire",
       reason: "qu’on me fasse rire",
       labelNum: "Raison 18",
       templates: [
@@ -163,7 +163,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "slow_dance",
+      id: "danser",
       reason: "qu’on danse lentement",
       labelNum: "Raison 19",
       templates: [
@@ -172,7 +172,7 @@ export const ACTIONS = [
       ],
     },
     {
-      id: "hug",
+      id: "enlacer",
       reason: "qu’on me prenne dans les bras",
       labelNum: "Raison 20",
       templates: [
