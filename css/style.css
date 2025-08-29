@@ -53,7 +53,7 @@ header {
     flex: 0 0 auto;
     width: var(--logo);
     height: var(--logo);
-    border-radius: 16px;
+    border-radius: 10px;
     display: grid;
     place-items: center;
     /* le texte “PH” scale avec la hauteur du carré */
@@ -91,7 +91,7 @@ header {
     content: attr(data-tagline);
     display: inline-block;
     position: absolute;
-    bottom: -7px;
+    bottom: -10px;
     left: 3px;
     font-size: clamp(12px, calc(var(--logo) * 0.24), 14px);
     font-weight: 700;
@@ -109,6 +109,32 @@ header {
       -webkit-text-fill-color: transparent; /* Safari/WebKit */
     }
 }
+
+/* Texte en gradient animé (slide gauche → droite → gauche) */
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .title h1::after {
+      /* on passe d'un dégradé statique à un dégradé plus long qu'on fera défiler */
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent));
+      background-size: 200% 100%;
+      animation: taglineFlow 6s ease-in-out infinite;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+  }
+  
+  @keyframes taglineFlow {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+  
+  /* Respect des préférences d’accessibilité */
+  @media (prefers-reduced-motion: reduce) {
+    .title h1::after { animation: none; }
+  }
+  
 
   /* Si pas de tagline (attribut vide), on ne montre rien */
   .title h1[data-tagline=""]::after {
@@ -318,8 +344,26 @@ header {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: 16px;
+}
+/* Aides sous grilles prefs */
+.grid-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  /* Les labels “reason” servent aussi aux zones : aligne un peu mieux les checkbox */
+  .reason input[type="checkbox"] {
+    transform: scale(1.15);
+  }
+/* responsive */
+
+@media (max-width:720px) {
+    .actions-row {
+        flex-direction: column;
+    }
 }
 
 /* Buttons */

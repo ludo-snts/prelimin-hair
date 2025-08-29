@@ -1,184 +1,73 @@
 // js/data.js
-export const ACTIONS = [
-    {
-      id: "mordre",
-      reason: "être mordu·e",
-      labelNum: "Raison 01",
-      templates: [
-        "{actor} mordille délicatement {recipient} à {n} endroits.",
-        "{actor} mordille délicatement {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "griffer",
-      reason: "qu’on me griffe (doucement)",
-      labelNum: "Raison 02",
-      templates: [
-        "{actor} trace de légères griffures sur l’avant-bras de {recipient} {n} fois.",
-        "{actor} érafle très doucement le dos de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "chatouiller",
-      reason: "qu’on me chatouille",
-      labelNum: "Raison 03",
-      templates: [
-        "{actor} chatouille {recipient} {n} fois.",
-        "{actor} chatouille {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "masser_epaule",
-      reason: "qu’on me masse les épaules",
-      labelNum: "Raison 04",
-      templates: [
-        "{actor} masse les épaules de {recipient} pendant {n} secondes.",
-        "{actor} pétrit doucement les trapèzes de {recipient} {n} fois.",
-      ],
-    },
-    {
-      id: "caresser_cheveux",
-      reason: "qu’on me caresse les cheveux",
-      labelNum: "Raison 05",
-      templates: [
-        "{actor} caresse les cheveux de {recipient} {n} fois.",
-        "{actor} passe la main dans les cheveux de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "murmurer",
-      reason: "qu’on me murmure à l’oreille",
-      labelNum: "Raison 06",
-      templates: [
-        "{actor} murmure un compliment à {recipient} {n} fois.",
-        "{actor} chuchote à l’oreille de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "embrasser",
-      reason: "qu’on m’embrasse (joue/nuque)",
-      labelNum: "Raison 07",
-      templates: [
-        "{actor} dépose des baisers sur la joue de {recipient} {n} fois.",
-        "{actor} embrasse la nuque de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "fixer_regard",
-      reason: "qu’on me fixe du regard",
-      labelNum: "Raison 08",
-      templates: [
-        "{actor} tient le regard de {recipient} pendant {n} secondes.",
-        "{actor} envoie {n} clins d’œil complices à {recipient}.",
-      ],
-    },
-    {
-      id: "tenir_main",
-      reason: "qu’on me prenne la main",
-      labelNum: "Raison 09",
-      templates: [
-        "{actor} prend la main de {recipient} {n} fois.",
-        "{actor} garde la main de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "effleurer",
-      reason: "qu’on m’effleure la nuque",
-      labelNum: "Raison 10",
-      templates: [
-        "{actor} effleure la nuque de {recipient} {n} fois.",
-        "{actor} effleure la nuque de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "chanter",
-      reason: "qu’on me chante doucement",
-      labelNum: "Raison 11",
-      templates: [
-        "{actor} fredonne à {recipient} {n} fois.",
-        "{actor} chante doucement à {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "pincer",
-      reason: "qu’on me pince (très légèrement)",
-      labelNum: "Raison 12",
-      templates: [
-        "{actor} pince très légèrement le bras de {recipient} {n} fois.",
-        "{actor} applique de petits pincements doux à {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "souffler_cou",
-      reason: "qu’on me souffle au cou",
-      labelNum: "Raison 13",
-      templates: [
-        "{actor} souffle au niveau du cou de {recipient} {n} fois.",
-        "{actor} souffle au cou de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "masser_main",
-      reason: "qu’on me masse les mains",
-      labelNum: "Raison 14",
-      templates: [
-        "{actor} masse les mains de {recipient} pendant {n} secondes.",
-        "{actor} presse doucement la paume de {recipient} {n} fois.",
-      ],
-    },
-    {
-      id: "complimenter",
-      reason: "qu’on me fasse des compliments",
-      labelNum: "Raison 15",
-      templates: [
-        "{actor} dit {n} compliments à {recipient}.",
-        "{actor} complimente {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "froler_epaule",
-      reason: "qu’on me frôle l’épaule",
-      labelNum: "Raison 16",
-      templates: [
-        "{actor} frôle l’épaule de {recipient} {n} fois.",
-        "{actor} frôle l’épaule de {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "donner_surnom",
-      reason: "qu’on me donne un surnom",
-      labelNum: "Raison 17",
-      templates: [
-        "{actor} donne {n} surnoms tendres à {recipient}.",
-        "{actor} susurre un surnom à {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "rire",
-      reason: "qu’on me fasse rire",
-      labelNum: "Raison 18",
-      templates: [
-        "{actor} raconte {n} mini blagues à {recipient}.",
-        "{actor} fait rire {recipient} pendant {n} secondes.",
-      ],
-    },
-    {
-      id: "danser",
-      reason: "qu’on danse lentement",
-      labelNum: "Raison 19",
-      templates: [
-        "{actor} danse lentement avec {recipient} pendant {n} secondes.",
-        "{actor} guide {recipient} dans {n} pas lents.",
-      ],
-    },
-    {
-      id: "enlacer",
-      reason: "qu’on me prenne dans les bras",
-      labelNum: "Raison 20",
-      templates: [
-        "{actor} serre {recipient} dans ses bras {n} fois.",
-        "{actor} enlace {recipient} pendant {n} secondes.",
-      ],
-    },
+
+// 1) Les 10 actions "soft"
+export const ACTIONS_BASE = [
+    { id: "mordre",      reason: "qu’on me morde",     labelNum: "Action 01", verb: "mordille délicatement" },
+    { id: "griffer",     reason: "qu’on me griffe",    labelNum: "Action 02", verb: "griffe très doucement" },
+    { id: "chatouiller", reason: "qu’on me chatouille",labelNum: "Action 03", verb: "chatouille" },
+    { id: "masser",      reason: "qu’on me masse",     labelNum: "Action 04", verb: "masse" },
+    { id: "embrasser",   reason: "qu’on m’embrasse",   labelNum: "Action 05", verb: "embrasse" },
+    { id: "effleurer",   reason: "qu’on m’effleure",   labelNum: "Action 06", verb: "effleure" },
+    { id: "caresser",    reason: "qu’on me caresse",   labelNum: "Action 07", verb: "caresse" },
+    { id: "pincer",      reason: "qu’on me pince (très légèrement)", labelNum: "Action 08", verb: "pince très légèrement" },
+    { id: "souffler",    reason: "qu’on me souffle dessus",          labelNum: "Action 09", verb: "souffle" },
+    { id: "tapoter",     reason: "qu’on me tapote (doucement)",       labelNum: "Action 10", verb: "tapote tout doucement" },
   ];
+  
+  // 2) Les 12 zones refus possibles
+  export const BODY_PARTS = [
+    { id: "joues",        label: "joues",        def: "les joues" },
+    { id: "oreilles",    label: "oreilles",    def: "les oreilles",
+      for: { souffler: "à l’oreille" } // ex: “souffler à l’oreille”
+    },
+    { id: "cou",         label: "cou",         def: "le cou",
+      for: { souffler: "dans le cou" }
+    },
+    { id: "nuque",       label: "nuque",       def: "la nuque",
+      for: { souffler: "sur la nuque" }
+    },
+    { id: "cheveux",     label: "cheveux",     def: "les cheveux",
+      for: { souffler: "dans les cheveux" }
+    },
+    { id: "haut_dos",    label: "haut du dos", def: "le haut du dos" },
+    { id: "bas_dos",     label: "bas du dos",  def: "le bas du dos" },
+    { id: "ventre",      label: "ventre",      def: "le ventre" },
+    { id: "avant_bras",  label: "avant-bras",  def: "l’avant-bras" },
+    { id: "doigts",       label: "doigts",       def: "les doigts" },
+    { id: "cuisses",      label: "cuisses",      def: "les cuisses" },
+  ];
+  
+  // 3) Compatibilité action ↔ zone
+  export const ACTION_ZONE_COMPAT = {
+    mordre:      ["joues", "oreilles", "cou", "nuque", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    griffer:     ["joues", "oreilles", "cou", "nuque", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    chatouiller: ["joues", "cou", "nuque", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    masser:      ["nuque", "cheveux", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    embrasser:   ["joues", "oreilles", "cou", "nuque", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    effleurer:   ["joues", "oreilles", "cou", "nuque", "cheveux", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    caresser:    ["joues", "oreilles", "cou", "nuque", "cheveux", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    pincer:      ["joues", "haut_dos", "bas_dos", "ventre", "avant_bras", "cuisses"],
+    souffler:    ["joues", "cou", "nuque", "cheveux", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+    tapoter:     ["joues", "cou", "nuque", "haut_dos", "bas_dos", "ventre", "avant_bras", "doigts", "cuisses"],
+  };
+  
+  // 4) Générateur de phrase
+  export function buildPhrase({
+    actor, recipient, actionId, bodyId, n, mode = "count" /* "count" | "time" */
+  }) {
+    const action = ACTIONS_BASE.find(a => a.id === actionId);
+    const body   = BODY_PARTS.find(b => b.id === bodyId);
+    if (!action || !body) return "";
+  
+    // Prépos particulier pour “souffler”
+    const specialPrep = body.for?.[actionId];
+    const target = (actionId === "souffler")
+      ? (specialPrep || `près de ${body.def}`)
+      : body.def;
+  
+    const core = `${action.verb} ${target} de ${recipient}`;
+    return mode === "time"
+      ? `${actor} ${core} pendant ${n} secondes.`
+      : `${actor} ${core} ${n} fois.`;
+  }
   

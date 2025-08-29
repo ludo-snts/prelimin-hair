@@ -1,12 +1,13 @@
 // js/script.js
-import { ACTIONS } from "./data.js";
+import { ACTIONS_BASE, BODY_PARTS, ACTION_ZONE_COMPAT, buildPhrase } from "./data.js";
 
 (function () {
   // ===== State =====
   const state = {
     numPlayers: null,
-    repetitions: null,
-    players: [], // {name, dislikes:Set<actionId>}
+    repsMode: "fixed",          // "fixed" | "random"
+    repetitions: null,          // si fixed: 3/5/7
+    players: [],                // {name, dislikedActions:Set, refusedZones:Set}
     currentIndex: 0,
   };
 
@@ -29,12 +30,13 @@ import { ACTIONS } from "./data.js";
   const btnCustom        = document.getElementById("btn-custom"); // sera remplacé par un <input>
 
   // Players
-  const playerForm  = document.getElementById("player-form");
-  const playerName  = document.getElementById("player-name");
-  const reasonsGrid = document.getElementById("reasons-grid");
-  const playerIndex = document.getElementById("player-index");
-  const prevPlayer  = document.getElementById("prev-player");
-  const nextPlayer  = document.getElementById("next-player");
+  const playerForm   = document.getElementById("player-form");
+  const playerName   = document.getElementById("player-name");
+  const actionsGrid  = document.getElementById("actions-grid");
+  const zonesGrid    = document.getElementById("zones-grid");
+  const playerIndex  = document.getElementById("player-index");
+  const prevPlayer   = document.getElementById("prev-player");
+  const nextPlayer   = document.getElementById("next-player");
 
   // Play
   const actionPhrase = document.getElementById("action-phrase");
@@ -45,19 +47,14 @@ import { ACTIONS } from "./data.js";
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const pick  = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-  function setStep(step) {
-    [1,2,3].forEach((s) => stepChips[s].classList.toggle("active", s === step));
-  }
+  function setStep(step) { [1,2,3].forEach((s) => stepChips[s].classList.toggle("active", s === step)); }
   function show(el){ el.classList.remove("hidden"); }
   function hide(el){ el.classList.add("hidden");  }
 
-  // (sécurisation)
   function updateContinueButton() {
-    const ok =
-      Number.isInteger(state.numPlayers) &&
-      state.numPlayers >= 2 && state.numPlayers <= 12 &&
-      Number.isInteger(state.repetitions) && state.repetitions > 0;
-    gotoPlayers.disabled = !ok;
+    const playersOk = Number.isInteger(state.numPlayers) && state.numPlayers >= 2 && state.numPlayers <= 12;
+    const repsOk    = (state.repsMode === "random") || (Number.isInteger(state.repetitions) && state.repetitions > 0);
+    gotoPlayers.disabled = !(playersOk && repsOk);
   }
 
   function markSelected(container, selectorAttr, value) {
@@ -67,7 +64,7 @@ import { ACTIONS } from "./data.js";
     });
   }
 
-  // ===== Message info sous la grille des participants =====
+  // ===== Info "participants" sous la grille =====
   function showParticipantsInfo(show) {
     let info = document.getElementById("participants-info");
     if (show) {
@@ -75,10 +72,10 @@ import { ACTIONS } from "./data.js";
         info = document.createElement("div");
         info.id = "participants-info";
         info.textContent = "Saisir un nombre de participants entre 2 et 12";
-        info.style.marginTop   = "8px";
-        info.style.color       = "#cfd1d8";
-        info.style.fontWeight  = "700";
-        info.style.fontSize    = "12px";
+        info.style.marginTop = "8px";
+        info.style.color = "#cfd1d8";
+        info.style.fontWeight = "700";
+        info.style.fontSize = "12px";
         info.style.letterSpacing = ".3px";
         participantsGrid.insertAdjacentElement("afterend", info);
       }
@@ -87,7 +84,7 @@ import { ACTIONS } from "./data.js";
     }
   }
 
-  // ===== Custom "AUTRE" : transformer le bouton en input =====
+  // ===== "AUTRE" => input number inline =====
   function ensureCustomInput() {
     let input = document.getElementById("custom-participants-input");
     if (input) return input;
@@ -105,16 +102,9 @@ import { ACTIONS } from "./data.js";
 
     btnCustom.replaceWith(newInput);
 
-    // Écoutes
     newInput.addEventListener("focus", () => showParticipantsInfo(true));
-
-    newInput.addEventListener("input", () => {
-      updateFromCustomInput(newInput.value);
-    });
-
-    newInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") e.preventDefault(); // pas de bouton Valider
-    });
+    newInput.addEventListener("input", () => updateFromCustomInput(newInput.value));
+    newInput.addEventListener("keydown", (e) => { if (e.key === "Enter") e.preventDefault(); });
 
     return newInput;
   }
@@ -126,69 +116,90 @@ import { ACTIONS } from "./data.js";
     const n = Number(value);
     const valid = Number.isInteger(n) && n >= 2 && n <= 12;
 
-    // Visuel : input .selected si sélectionné/actif
-    input.classList.toggle("selected", true); // reste visuellement "le bouton choisi"
-    // Si valide, on sélectionne la valeur
+    input.classList.toggle("selected", true);
     if (valid) {
       state.numPlayers = n;
       input.dataset.customValue = String(n);
-      // Désélectionner 2/3/4 pour éviter toute ambiguïté
       markSelected(participantsGrid, "data-participants", null);
       saveSetup();
     } else {
-      // Valeur non valide => on garde la sélection visuelle d'AUTRE,
-      // mais on n'autorise pas la suite
       state.numPlayers = null;
     }
     updateContinueButton();
   }
 
-  // ===== Build reasons list =====
-  function renderReasons() {
-    reasonsGrid.innerHTML = "";
-    ACTIONS.forEach((a) => {
-      const id = `r-${a.id}`;
-      const item = document.createElement("label");
-      item.className = "reason";
-      item.innerHTML = `
+  // ===== Rendu grilles préférences =====
+  function renderActions() {
+    actionsGrid.innerHTML = "";
+    ACTIONS_BASE.forEach((a) => {
+      const id = `act-${a.id}`;
+      const label = document.createElement("label");
+      label.className = "reason";
+      label.innerHTML = `
         <input type="checkbox" id="${id}" value="${a.id}">
         <div class="lbl">${a.reason}</div>`;
-      reasonsGrid.appendChild(item);
+      actionsGrid.appendChild(label);
     });
   }
-  
 
-  // ===== Players load/save =====
+  function renderZones() {
+    zonesGrid.innerHTML = "";
+    BODY_PARTS.forEach((z) => {
+      const id = `zone-${z.id}`;
+      const label = document.createElement("label");
+      label.className = "reason";
+      label.innerHTML = `
+        <input type="checkbox" id="${id}" value="${z.id}">
+        <div class="lbl">ne pas toucher ${z.def}</div>`;
+      zonesGrid.appendChild(label);
+    });
+  }
+
+  // ===== Load/Save joueur courant =====
   function loadPlayer(idx) {
     setStep(2);
     playerIndex.textContent = `Joueur ${idx + 1} / ${state.numPlayers}`;
-    const existing = state.players[idx];
-    playerName.value = existing?.name || `Joueur ${idx + 1}`;
-    reasonsGrid.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-      cb.checked = existing ? existing.dislikes.has(cb.value) : false;
+    const p = state.players[idx];
+
+    playerName.value = p?.name || `Joueur ${idx + 1}`;
+
+    // Actions
+    actionsGrid.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = p?.dislikedActions ? p.dislikedActions.has(cb.value) : false;
     });
+
+    // Zones
+    zonesGrid.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.checked = p?.refusedZones ? p.refusedZones.has(cb.value) : false;
+    });
+
     prevPlayer.disabled = idx === 0;
     nextPlayer.textContent = idx === state.numPlayers - 1 ? "COMMENCER" : "Continuer";
   }
 
   function savePlayer(idx) {
     const name = playerName.value.trim() || `Joueur ${idx + 1}`;
-    const dislikes = new Set(
-      Array.from(reasonsGrid.querySelectorAll('input[type="checkbox"]:checked')).map((cb) => cb.value)
+
+    const dislikedActions = new Set(
+      Array.from(actionsGrid.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
     );
-    state.players[idx] = { name, dislikes };
+    const refusedZones = new Set(
+      Array.from(zonesGrid.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+    );
+
+    state.players[idx] = { name, dislikedActions, refusedZones };
+    savePlayers();
   }
 
-  // ===== Persistance setup =====
+  // ===== Persistance =====
   function saveSetup() {
-    localStorage.setItem(
-      "ph_setup",
-      JSON.stringify({
-        numPlayers: state.numPlayers,
-        repetitions: state.repetitions,
-      })
-    );
+    localStorage.setItem("ph_setup", JSON.stringify({
+      numPlayers: state.numPlayers,
+      repsMode: state.repsMode,
+      repetitions: state.repetitions,
+    }));
   }
+
   function loadSetup() {
     try {
       const raw = localStorage.getItem("ph_setup");
@@ -198,13 +209,43 @@ import { ACTIONS } from "./data.js";
       if (Number.isInteger(s?.numPlayers)) {
         state.numPlayers = clamp(s.numPlayers, 2, 12);
       }
-      if (Number.isInteger(s?.repetitions)) {
+      state.repsMode = (s?.repsMode === "random") ? "random" : "fixed";
+
+      if (state.repsMode === "fixed" && Number.isInteger(s?.repetitions)) {
         state.repetitions = s.repetitions;
         markSelected(repsGrid, "data-reps", state.repetitions);
+      } else if (state.repsMode === "random") {
+        markSelected(repsGrid, "data-reps", "random");
       }
+
       markSelected(participantsGrid, "data-participants", state.numPlayers);
       updateContinueButton();
-    } catch (_) {}
+    } catch(_) {}
+  }
+
+  function savePlayers() {
+    const serial = state.players.map(p => ({
+      name: p?.name || "",
+      dislikedActions: p?.dislikedActions ? Array.from(p.dislikedActions) : [],
+      refusedZones: p?.refusedZones ? Array.from(p.refusedZones) : [],
+    }));
+    localStorage.setItem("ph_players", JSON.stringify(serial));
+  }
+
+  function loadPlayers() {
+    try {
+      const raw = localStorage.getItem("ph_players");
+      if (!raw) return;
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return;
+      if (!state.numPlayers || arr.length !== state.numPlayers) return;
+
+      state.players = arr.map((p, i) => ({
+        name: p?.name || `Joueur ${i + 1}`,
+        dislikedActions: new Set(Array.isArray(p?.dislikedActions) ? p.dislikedActions : []),
+        refusedZones: new Set(Array.isArray(p?.refusedZones) ? p.refusedZones : []),
+      }));
+    } catch(_) {}
   }
 
   // ===== Setup handlers =====
@@ -212,30 +253,21 @@ import { ACTIONS } from "./data.js";
     const btn = e.target.closest(".option-btn");
     if (!btn) return;
 
-    // 1) Clic sur AUTRE (bouton initial)
+    // Clic sur AUTRE
     if (btn.id === "btn-custom") {
       const inputEl = ensureCustomInput();
-
-      // Indiquer visuellement que c'est le choix actif
-      inputEl.classList.add("selected");           // dégradé rose
-      markSelected(participantsGrid, "data-participants", null); // désélectionner 2/3/4
+      inputEl.classList.add("selected");
+      markSelected(participantsGrid, "data-participants", null);
       showParticipantsInfo(true);
-
-      // focus + select
       inputEl.focus();
       inputEl.select();
 
-      // Si une valeur existe déjà, la ré-appliquer
       if (inputEl.value) updateFromCustomInput(inputEl.value);
-      else {
-        // pas de valeur → on bloque le "Continuer"
-        state.numPlayers = null;
-        updateContinueButton();
-      }
+      else { state.numPlayers = null; updateContinueButton(); }
       return;
     }
 
-    // 2) Clic direct sur l'input "AUTRE" (déjà transformé)
+    // Clic sur l'input AUTRE déjà présent
     if (btn.id === "custom-participants-input") {
       btn.classList.add("selected");
       markSelected(participantsGrid, "data-participants", null);
@@ -243,14 +275,13 @@ import { ACTIONS } from "./data.js";
       return;
     }
 
-    // 3) Boutons 2/3/4
+    // Boutons 2/3/4
     const val = Number(btn.dataset.participants);
     if (!Number.isNaN(val)) {
       state.numPlayers = clamp(val, 2, 12);
-      // visuel : sélectionner ce bouton, désélectionner "AUTRE"
       markSelected(participantsGrid, "data-participants", state.numPlayers);
       const customEl = document.getElementById("custom-participants-input");
-      if (customEl) customEl.classList.remove("selected"); // garde la valeur, enlève juste le style sélectionné
+      if (customEl) customEl.classList.remove("selected");
       showParticipantsInfo(false);
       updateContinueButton();
       saveSetup();
@@ -259,6 +290,7 @@ import { ACTIONS } from "./data.js";
 
   resetSetup.addEventListener("click", () => {
     state.numPlayers = null;
+    state.repsMode = "fixed";
     state.repetitions = null;
     state.players = [];
 
@@ -274,32 +306,54 @@ import { ACTIONS } from "./data.js";
     showParticipantsInfo(false);
 
     localStorage.removeItem("ph_setup");
+    localStorage.removeItem("ph_players");
     updateContinueButton();
   });
 
-  // Répétitions
+  // Répétitions (3/5/7/RANDOM)
   repsGrid.addEventListener("click", (e) => {
     const btn = e.target.closest(".option-btn");
     if (!btn) return;
-    const val = Number(btn.dataset.reps);
-    if (!Number.isNaN(val)) {
-      state.repetitions = val;
-      markSelected(repsGrid, "data-reps", state.repetitions);
-      updateContinueButton();
-      saveSetup();
+    const val = btn.dataset.reps;
+
+    if (val === "random") {
+      state.repsMode = "random";
+      state.repetitions = null;
+      markSelected(repsGrid, "data-reps", "random");
+    } else {
+      const n = Number(val);
+      if (!Number.isNaN(n)) {
+        state.repsMode = "fixed";
+        state.repetitions = n;
+        markSelected(repsGrid, "data-reps", state.repetitions);
+      }
     }
+    updateContinueButton();
+    saveSetup();
   });
 
-  // Lancer saisie joueurs
+  // Lancer l'écran joueurs
   gotoPlayers.addEventListener("click", () => {
-    state.players = Array.from({ length: state.numPlayers }, (_, i) => ({
-      name: `Joueur ${i + 1}`,
-      dislikes: new Set(),
-    }));
-    state.currentIndex = 0;
+    // si déjà des joueurs en storage avec la même taille, on les recharge
+    if (!state.players.length) {
+      state.players = Array.from({ length: state.numPlayers }, (_, i) => ({
+        name: `Joueur ${i + 1}`,
+        dislikedActions: new Set(),
+        refusedZones: new Set(),
+      }));
+      loadPlayers(); // tentera d’écraser par ceux du storage si compatibles
+    } else if (state.players.length !== state.numPlayers) {
+      state.players = Array.from({ length: state.numPlayers }, (_, i) => ({
+        name: `Joueur ${i + 1}`,
+        dislikedActions: new Set(),
+        refusedZones: new Set(),
+      }));
+    }
+
     hide(screenSetup);
     show(screenPlayers);
-    renderReasons();
+    renderActions();
+    renderZones();
     loadPlayer(0);
   });
 
@@ -331,27 +385,25 @@ import { ACTIONS } from "./data.js";
     rollAction();
   }
 
-  function possibleTriples() {
-    const triples = [];
-    for (let i = 0; i < state.players.length; i++) {
-      for (let j = 0; j < state.players.length; j++) {
-        if (i === j) continue;
-        const recipient = state.players[j];
-        ACTIONS.forEach((action) => {
-          if (!recipient.dislikes.has(action.id)) {
-            triples.push([i, j, action]);
-          }
+  function possibleCombos() {
+    const combos = [];
+    for (let ai = 0; ai < state.players.length; ai++) {
+      for (let ri = 0; ri < state.players.length; ri++) {
+        if (ai === ri) continue;
+        const recip = state.players[ri];
+
+        ACTIONS_BASE.forEach(action => {
+          if (recip.dislikedActions?.has(action.id)) return;
+
+          const zones = ACTION_ZONE_COMPAT[action.id] || [];
+          zones.forEach(zoneId => {
+            if (recip.refusedZones?.has(zoneId)) return;
+            combos.push([ai, ri, action.id, zoneId]);
+          });
         });
       }
     }
-    return triples;
-  }
-
-  function phraseFromTemplate(tpl, actor, recipient, n) {
-    return tpl
-      .replaceAll("{actor}", actor)
-      .replaceAll("{recipient}", recipient)
-      .replaceAll("{n}", n);
+    return combos;
   }
 
   function shuffleInPlace(arr) {
@@ -362,23 +414,23 @@ import { ACTIONS } from "./data.js";
   }
 
   function rollAction() {
-    const triples = possibleTriples();
-    if (triples.length === 0) {
+    const combos = possibleCombos();
+    if (combos.length === 0) {
       actionPhrase.textContent =
-        "Aucune action possible avec ces préférences. Modifiez vos ‘je n’aime pas…’ et relancez.";
-    //   actionNames.innerHTML = "";
+        "Aucune action possible avec ces préférences. Ajustez vos refus et relancez.";
       return;
     }
-    shuffleInPlace(triples);
-    const [ai, ri, action] = triples[0];
+    shuffleInPlace(combos);
+    const [ai, ri, actionId, bodyId] = combos[0];
     const actor = state.players[ai].name;
     const recipient = state.players[ri].name;
-    const n = state.repetitions;
 
-    const tpl = pick(action.templates);
-    const sentence = phraseFromTemplate(tpl, actor, recipient, n);
+    const n = (state.repsMode === "random") ? pick([3,5,7]) : state.repetitions;
+    const mode = Math.random() < 0.5 ? "count" : "time";
 
-    actionPhrase.textContent = sentence;
+    actionPhrase.textContent = buildPhrase({
+      actor, recipient, actionId, bodyId, n, mode
+    });
   }
 
   doneBtn.addEventListener("click", rollAction);

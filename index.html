@@ -4,13 +4,10 @@
   <meta charset="utf-8">
   <title>PRÉLIMIN’HAIR — Le jeu qui vous brosse dans le sens du poil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./assets/PH_LOGO.png">
   <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-
 </head>
 <body>
   <div class="wrap">
@@ -37,10 +34,7 @@
           <button class="option-btn" data-participants="4">4</button>
           <button class="option-btn" id="btn-custom">Autre…</button>
         </div>
-        <div class="option-inline hidden" id="custom-participants-row">
-          <input type="number" id="custom-participants" min="2" max="12" placeholder="Entre 2 et 12">
-          <button class="btn btn-ghost" id="apply-custom">Valider</button>
-        </div>
+        <!-- (on n'ouvre plus de ligne “custom”; le bouton Autre se transforme en input dans-place) -->
       </div>
 
       <div class="hr"></div>
@@ -51,7 +45,7 @@
           <button class="option-btn" data-reps="3">3</button>
           <button class="option-btn" data-reps="5">5</button>
           <button class="option-btn" data-reps="7">7</button>
-          <button class="option-btn" data-reps="9">9</button>
+          <button class="option-btn" data-reps="random">RANDOM</button>
         </div>
       </div>
 
@@ -67,6 +61,7 @@
         <div class="player-index" id="player-index">Joueur 1 / N</div>
         <div class="chip"><span class="dot"></span> Préférences personnelles</div>
       </div>
+
       <form class="player-form" id="player-form">
         <div class="field">
           <label for="player-name"><strong>Nom du joueur</strong></label>
@@ -74,8 +69,15 @@
         </div>
 
         <div class="field">
-          <div class="group-label">Je n’aime pas…</div>
-          <div class="reason-grid" id="reasons-grid"><!-- injected --></div>
+          <div class="group-label">Je n’aime pas ces actions</div>
+          <div class="reason-grid" id="actions-grid"><!-- inject --></div>
+          <div class="grid-hint">Décochez rien si tout va ✨</div>
+        </div>
+
+        <div class="field">
+          <div class="group-label">Zones que je refuse</div>
+          <div class="reason-grid" id="zones-grid"><!-- inject --></div>
+          <div class="grid-hint">Cochez les zones à éviter ❌</div>
         </div>
 
         <div class="actions-row">
@@ -90,17 +92,17 @@
       <div class="play-card">
         <div class="who">C’est parti !</div>
         <div class="phrase" id="action-phrase">—</div>
-        <div class="names" id="action-names"><!-- tags here --></div>
         <div class="note">Rappel : respect & consentement en continu. Vous pouvez passer si quelque chose ne convient pas.</div>
         <div class="actions-row" style="justify-content:space-between">
           <button class="btn btn-ghost" id="restart">Revenir aux préférences</button>
           <button class="btn btn-ok" id="done">C’EST FAIT</button>
         </div>
       </div>
-      <footer class="small">Astuce : le jeu choisit toujours une action que la personne ciblée n’a pas refusée.</footer>
+      <footer class="small">Astuce : le jeu choisit toujours une action/zone que la personne ciblée n’a pas refusée.</footer>
     </section>
   </div>
 
   <!-- JS -->
-  <script type="module" src="./js/script.js"></script></body>
+  <script type="module" src="./js/script.js"></script>
+</body>
 </html>
